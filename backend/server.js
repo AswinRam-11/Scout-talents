@@ -38,35 +38,43 @@ app.get('/api/players/search', async (req, res) => {
  * @desc    Find top 10 lookalikes using pgvector Cosine Distance (<=>)
  */
 
+// backend/server.js
 app.post('/api/players/recommend', async (req, res) => {
-  const { playerId, maxAge, maxMarketValue } = req.body;
-
-  if (!playerId) {
-    return res.status(400).json({ error: 'Target playerId is required.' });
-  }
+  // 1. Destructure both minAge and maxAge sent from your updated Dashboard component
+  const { playerId, minAge, maxAge } = req.body;
+  if (!playerId) return res.status(400).json({ error: 'playerId required' });
 
   try {
-    // 1. Fetch the target player's stats vector
-    const targetQuery = 'SELECT stats_vector, player FROM players WHERE id = $1';
-    const targetResult = await db.query(targetQuery, [playerId]);
+    // Fetch the baseline player model vectors
+    const targetRes = await db.query(
+      'SELECT player, vector_shooting, vector_passing, vector_possession, vector_defending FROM players WHERE id = $1', 
+      [playerId]
+    );
+    if (targetRes.rows.length === 0) return res.status(404).json({ error: 'Player not found' });
+    
+    const t = targetRes.rows[0];
 
-    if (targetResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Target player not found.' });
-    }
-
-    const targetVector = targetResult.rows[0].stats_vector;
-
-    // 2. Build the live pgvector similarity query
-    // $1 = targetVector, $2 = playerId (integer)
+    // 2. Base query calculating the 4 similarity classifications independently via pgvector (<=>)
     let queryText = `
       SELECT *,
-             (1 - (stats_vector <=> $1::vector)) * 100 AS match_percentage
+        (1 - (vector_shooting <=> $2::vector)) * 100 AS match_shooting,
+        (1 - (vector_passing <=> $3::vector)) * 100 AS match_passing,
+        (1 - (vector_possession <=> $4::vector)) * 100 AS match_possession,
+        (1 - (vector_defending <=> $5::vector)) * 100 AS match_defending
       FROM players
-      WHERE id != $2
+      WHERE id != $1
     `;
     
-    const queryParams = [targetVector, parseInt(playerId)];
-    let paramCounter = 3;
+    // Initialize our parameters matrix array matching $1 through $5
+    const queryParams = [playerId, t.vector_shooting, t.vector_passing, t.vector_possession, t.vector_defending];
+    let paramCounter = 6; // Dynamic variables will begin assigning at index $6
+
+    // 3. Dynamic Threshold Constraints Append
+    if (minAge) {
+      queryText += ` AND age >= $${paramCounter}`;
+      queryParams.push(parseInt(minAge));
+      paramCounter++;
+    }
 
     if (maxAge) {
       queryText += ` AND age <= $${paramCounter}`;
@@ -74,16 +82,38 @@ app.post('/api/players/recommend', async (req, res) => {
       paramCounter++;
     }
 
+    // 4. Stable Order By Sorting Clause mapped safely back to immutable indexes $2, $3, $4, $5
     queryText += `
-      ORDER BY stats_vector <=> $1::vector ASC
-      LIMIT 10
+      ORDER BY (
+        (vector_shooting <=> $2::vector) + 
+        (vector_passing <=> $3::vector) + 
+        (vector_possession <=> $4::vector) + 
+        (vector_defending <=> $5::vector)
+      ) ASC LIMIT 10
     `;
 
-    const { rows: recommendations } = await db.query(queryText, queryParams);
-    res.json(recommendations);
+    const { rows } = await db.query(queryText, queryParams);
+
+    // 5. Build full net aggregation score arrays for your React mapping loops
+    const calculatedRows = rows.map(row => {
+      const s = parseFloat(row.match_shooting) || 0;
+      const p = parseFloat(row.match_passing) || 0;
+      const pos = parseFloat(row.match_possession) || 0;
+      const d = parseFloat(row.match_defending) || 0;
+      return {
+        ...row,
+        match_shooting: s, 
+        match_passing: p, 
+        match_possession: pos, 
+        match_defending: d,
+        match_percentage: (s + p + pos + d) / 4 // The net unified aggregate percentage match
+      };
+    });
+
+    res.json(calculatedRows);
   } catch (err) {
-    console.error('Recommendation API Error:', err.message);
-    res.status(500).json({ error: 'Vector processing compilation error.' });
+    console.error('Recommendation Engine Error:', err.message);
+    res.status(500).json({ error: 'Vector query mapping failure.' });
   }
 });
 

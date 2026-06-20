@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function SearchBar({ onSelectTarget, maxAge, setMaxAge, onSearchTrigger, clearRecomondation }) {
+export default function SearchBar({ onSelectTarget, maxAge, setMaxAge, minAge, setMinAge, onSearchTrigger, clearRecomondation }) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
@@ -64,6 +64,17 @@ export default function SearchBar({ onSelectTarget, maxAge, setMaxAge, onSearchT
           max="45"
           value={maxAge}
           onChange={(e) => setMaxAge(e.target.value)}
+        />
+      </div>
+      <div className="filter-group">
+        <label>Minimum Age</label>
+        <input
+          type="number"
+          className="input-field"
+          min="15"
+          max="45"
+          value={minAge}
+          onChange={(e) => setMinAge(e.target.value)}
         />
       </div>
 

@@ -224,3 +224,20 @@ body {
   font-weight: 600;
   color: var(--accent-neon);
 }
+
+/* App.css Table UI Expansion Styles */
+.data-table tr.table-section-header td {
+  border-left: 3px solid #00FF66 !important;
+  text-align: left !important;
+  font-family: monospace;
+}
+
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #1c241e;
+}
+
+.highlight-metric {
+  color: #00FF66;
+  font-weight: bold;
+}
