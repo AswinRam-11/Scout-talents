@@ -13,6 +13,23 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison }) {
     );
   }
 
+  // SAFE GUARD: Resolve the minutes/90s variable across multiple possible naming conventions
+  const target90s = parseFloat(targetPlayer['90s'] || targetPlayer.ninetyS || (targetPlayer.min / 90) || 1);
+  const comparison90s = parseFloat(activeComparison['90s'] || activeComparison.ninetyS || (activeComparison.min / 90) || 1);
+
+  // Safe shooting percentages fallback calculator
+  const targetShots = parseInt(targetPlayer.sh) || 0;
+  const targetSoT = parseInt(targetPlayer.sot) || 0;
+  const targetSotPct = targetPlayer.sot_pct 
+    ? `${targetPlayer.sot_pct}%` 
+    : targetShots > 0 ? `${((targetSoT / targetShots) * 100).toFixed(1)}%` : '0%';
+
+  const compShots = parseInt(activeComparison.sh) || 0;
+  const compSoT = parseInt(activeComparison.sot) || 0;
+  const compSotPct = activeComparison.sot_pct 
+    ? `${activeComparison.sot_pct}%` 
+    : compShots > 0 ? `${((compSoT / compShots) * 100).toFixed(1)}%` : '0%';
+
   return (
     <div className="right-panel">
       <h3 style={{ margin: '0 0 20px 0', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#8E9A8A' }}>
@@ -42,8 +59,8 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison }) {
             </tr>
             <tr>
               <td>Minutes Logged (90s)</td>
-              <td>{parseFloat(targetPlayer['90s'] || 0).toFixed(1)}</td>
-              <td>{parseFloat(activeComparison['90s'] || 0).toFixed(1)}</td>
+              <td>{target90s.toFixed(1)}</td>
+              <td>{comparison90s.toFixed(1)}</td>
             </tr>
 
             {/* --- SHOOTING TERMINAL GROUP --- */}
@@ -57,23 +74,23 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison }) {
             </tr>
             <tr>
               <td>Total Shots Attempted</td>
-              <td>{targetPlayer.sh || 0}</td>
-              <td>{activeComparison.sh || 0}</td>
+              <td>{targetShots}</td>
+              <td>{compShots}</td>
             </tr>
             <tr>
               <td>Shots on Target (SoT)</td>
-              <td>{targetPlayer.sot || 0}</td>
-              <td>{activeComparison.sot || 0}</td>
+              <td>{targetSoT}</td>
+              <td>{compSoT}</td>
             </tr>
             <tr>
               <td>Shooting Volume (Sh/90)</td>
-              <td>{parseFloat(targetPlayer.sh_90 || 0).toFixed(2)}</td>
-              <td>{parseFloat(activeComparison.sh_90 || 0).toFixed(2)}</td>
+              <td>{parseFloat(targetPlayer.sh_90 || targetPlayer.sh_per90 || 0).toFixed(2)}</td>
+              <td>{parseFloat(activeComparison.sh_90 || activeComparison.sh_per90 || 0).toFixed(2)}</td>
             </tr>
             <tr>
               <td>Accuracy Ratio (SoT%)</td>
-              <td>{targetPlayer.sot_pct ? `${targetPlayer.sot_pct}%` : `${((targetPlayer.sot / (targetPlayer.sh || 1)) * 100).toFixed(1)}%`}</td>
-              <td>{activeComparison.sot_pct ? `${activeComparison.sot_pct}%` : `${((activeComparison.sot / (activeComparison.sh || 1)) * 100).toFixed(1)}%`}</td>
+              <td>{targetSotPct}</td>
+              <td>{compSotPct}</td>
             </tr>
 
             {/* --- PASSING EXECUTION GROUP --- */}
@@ -92,8 +109,8 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison }) {
             </tr>
             <tr>
               <td>Estimated Key Passes</td>
-              <td>{(targetPlayer.ast || 0) * 3}</td>
-              <td>{(activeComparison.ast || 0) * 3}</td>
+              <td>{Math.round((targetPlayer.ast || 0) * 3)}</td>
+              <td>{Math.round((activeComparison.ast || 0) * 3)}</td>
             </tr>
 
             {/* --- SPATIAL POSSESSION GROUP --- */}
@@ -112,8 +129,8 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison }) {
             </tr>
             <tr>
               <td>Est. Attacking Touches</td>
-              <td>{Math.round((targetPlayer['90s'] || 1) * 50)}</td>
-              <td>{Math.round((activeComparison['90s'] || 1) * 50)}</td>
+              <td>{Math.round(target90s * 50)}</td>
+              <td>{Math.round(comparison90s * 50)}</td>
             </tr>
 
             {/* --- DEFENDING & DISCIPLINE GROUP --- */}

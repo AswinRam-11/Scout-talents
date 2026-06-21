@@ -14,7 +14,7 @@ function RenderRadar({ title, score, data, keys, targetName, replacementName }) 
           <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
             <PolarGrid stroke="#222" />
             <PolarAngleAxis dataKey="metric" stroke="#8E9A8A" fontSize={10} />
-            <Radar name={targetName} dataKey="Target" stroke="#8E9A8A" fill="#8E9A8A" fillOpacity={0.15} />
+            <Radar name={targetName} dataKey="Target" stroke="#e97e60" fill="#e97e60" fillOpacity={0.15} />
             <Radar name={replacementName} dataKey="Replacement" stroke="#00FF66" fill="#00FF66" fillOpacity={0.3} />
           </RadarChart>
         </ResponsiveContainer>
