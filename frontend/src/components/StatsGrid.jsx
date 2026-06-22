@@ -64,17 +64,20 @@ export default function StatsGrid({ targetPlayer, activeComparison }) {
     position: 'sticky',
     zIndex: 20,
     backgroundColor: '#070a08', // Solid flat background matches your panel core color exactly
-    backgroundClip: 'padding-box', // Prevents sub-borders from leaking during hardware scrolling acceleration
+    backgroundClip: 'border-box', // Prevents sub-borders from leaking during hardware scrolling acceleration
     color: '#5e6e63',
-    borderBottom: '1px solid #141c16'
+    marginTop: '0px',
+    borderBottom: '1px solid #141c16',
+
   };
 
   return (
     <div style={{ background: '#070a08', borderRadius: '8px', border: '1px solid #141c16', overflow: 'visible' }}>
       <table style={{ 
         width: '100%', 
-        borderCollapse: 'separate', 
+        borderCollapse: 'collapse', 
         borderSpacing: 0,
+        border: '2px solid green',
         textAlign: 'left', 
         fontSize: '13px', 
         fontFamily: 'monospace' 
@@ -82,14 +85,14 @@ export default function StatsGrid({ targetPlayer, activeComparison }) {
         <thead>
           {/* --- STICKY ROW 1: PLAYER NAMES --- */}
           <tr>
-            <th style={{ ...stickyHeaderStyle, top: 0, padding: '16px', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', width: '40%' }}>
+            <th style={{ ...stickyHeaderStyle, top: -20, padding: '16px', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', width: '40%' }}>
               Core Performance Metrics
             </th>
-            <th colSpan="2" style={{ ...stickyHeaderStyle, top: 0, padding: '16px', textAlign: 'center', color: '#FF6384', borderRight: '1px solid #141c16', fontSize: '14px', fontWeight: '600' }}>
+            <th colSpan="2" style={{ ...stickyHeaderStyle, top: -20, padding: '16px', textAlign: 'center', color: '#FF6384', borderRight: '1px solid #141c16', fontSize: '14px', fontWeight: '600' }}>
               {targetPlayer.player}
               <span style={{ fontSize: '10px', color: '#5e6e63', display: 'block', marginTop: '2px', fontWeight: 'normal' }}>({t90.toFixed(1)} 90s Played)</span>
             </th>
-            <th colSpan="2" style={{ ...stickyHeaderStyle, top: 0, padding: '16px', textAlign: 'center', color: '#00FF66', fontSize: '14px', fontWeight: '600' }}>
+            <th colSpan="2" style={{ ...stickyHeaderStyle, top: -20, padding: '16px', textAlign: 'center', color: '#00FF66', fontSize: '14px', fontWeight: '600' }}>
               {activeComparison.player}
               <span style={{ fontSize: '10px', color: '#5e6e63', display: 'block', marginTop: '2px', fontWeight: 'normal' }}>({c90.toFixed(1)} 90s Played)</span>
             </th>
@@ -97,22 +100,23 @@ export default function StatsGrid({ targetPlayer, activeComparison }) {
 
           {/* --- STICKY ROW 2: SUBHEADERS (Locks tight flush beneath Row 1) --- */}
           <tr>
-            <th style={{ ...stickyHeaderStyle, top: '53px', padding: '8px 16px', fontSize: '10px' }}>
+            <th style={{ ...stickyHeaderStyle, top: '33px', padding: '8px 16px', fontSize: '10px' }}>
               STAT NAME
             </th>
-            <th style={{ ...stickyHeaderStyle, top: '53px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
+            <th style={{ ...stickyHeaderStyle, top: '33px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
               TOTAL
             </th>
-            <th style={{ ...stickyHeaderStyle, top: '53px', padding: '8px', textAlign: 'center', borderRight: '1px solid #141c16', fontSize: '10px' }}>
+            <th style={{ ...stickyHeaderStyle, top: '33px', padding: '8px', textAlign: 'center', borderRight: '1px solid #141c16', fontSize: '10px' }}>
               PER 90
             </th>
-            <th style={{ ...stickyHeaderStyle, top: '53px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
+            <th style={{ ...stickyHeaderStyle, top: '33px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
               TOTAL
             </th>
-            <th style={{ ...stickyHeaderStyle, top: '53px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
+            <th style={{ ...stickyHeaderStyle, top: '33px', padding: '8px', textAlign: 'center', fontSize: '10px' }}>
               PER 90
             </th>
           </tr>
+          
         </thead>
         <tbody>
           

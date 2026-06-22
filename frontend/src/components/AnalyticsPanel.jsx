@@ -85,10 +85,11 @@ export default function AnalyticsPanel({ targetPlayer, activeComparison, recomme
         margin: '64px 0 40px 0', 
         borderTop: '1px solid #141c16', 
         width: '100%',
-        opacity: 0.6
+        position: 'sticky',
+        opacity: 0.6,
       }} />
 
-      <div className="data-table-wrapper" style={{ width: '100%', paddingBottom: '60px' }}>
+      <div className="data-table-wrapper" style={{ width: '100%', marginTop:'0px', paddingBottom: '60px' }}>
         <StatsGrid targetPlayer={targetPlayer} activeComparison={activeComparison} />
       </div>
     </div>
